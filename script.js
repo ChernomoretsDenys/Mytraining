@@ -21,3 +21,8 @@ const reference = ref(database, databaseName)
 
 const container = document.getElementById("container")
 
+
+const currentDay = new Date().getDay()
+
+console.log(currentDay)
+
