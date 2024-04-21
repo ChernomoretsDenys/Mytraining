@@ -1,7 +1,7 @@
 "use strict"
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js"
-import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js"
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js"
 
 const databaseLink = {
 	databaseURL: "https://training-7c03e-default-rtdb.europe-west1.firebasedatabase.app/"
@@ -22,108 +22,106 @@ onValue(reference, function (snapshot) {
 
 let date = null
 let currentDayOfWeek = null
-let currentDayOfMonth = null
 
-let previousDayOfWeek = new Date().getDay()
+let previousDayOfWeek = 0
 
-let checkTime = setInterval(checkCurrentTime, 3000)
+let checkTime = setInterval(checkCurrentTime, 3600000)
 function checkCurrentTime() {
 	date = new Date()
 	currentDayOfWeek = date.getDay()
-	currentDayOfMonth = date.getDate()
-	console.log(currentDayOfWeek)
 	if (previousDayOfWeek !== currentDayOfWeek) {
 		previousDayOfWeek = currentDayOfWeek
+		eachDay()
 	}
 }
-console.log( currentDayOfWeek == 6)
-let week = 1
 
-if (currentDayOfWeek === 6) {
-	
-	let weekInterval = setInterval(globalCount, 1000)
-	function globalCount() {
-		if (week === 1) {
-			const currentWeek = weekArray[0][1]
-			displayWeek(currentWeek)
+let week = 1;
 
-			console.log(weekArray, currentWeek)
+const container = document.getElementById("container_table")
+
+function eachDay() {
+	if (previousDayOfWeek == 1 ||
+		previousDayOfWeek == 2 ||
+		previousDayOfWeek == 4 ||
+		previousDayOfWeek == 5) {
+
+		container.innerHTML = ''
+
+		let correctDayArr = null
+
+		switch (previousDayOfWeek) {
+			case 1:
+				correctDayArr = 0
+				break
+			case 2:
+				correctDayArr = 1
+				break
+			case 4:
+				correctDayArr = 2
+				break
+			case 5:
+				correctDayArr = 3
+				break
 		}
-		//else if (week === 2) {
-		// 	const currentWeek = weekArray[0]
-		// 	for (let day = 0; day < trainingData[0][1][1].length; day++) {
 
-		// 	}
-		// 	console.log(`2`, trainingData[0][1][1])
-		// } else if (week === 3) {
-		// 	for (let day = 0; day < trainingData[0][1][2].length; day++) {
+		function globalCount() {
+			if (week === 1) {
 
-		// 	}
-		// 	console.log(`3`, trainingData[0][1][2])
-		// } else {
-		// 	console.log("restarting training", trainingData[0][1][2][0])
-		// 	week = 0
-		// 	window.clearInterval(weekInterval)
-		// }
-		// week++
+				const currentWeek = weekArray[0][1][correctDayArr]
+				displayWeek(currentWeek)
+
+			} else if (week === 2) {
+
+				const currentWeek = weekArray[1][1][correctDayArr]
+				displayWeek(currentWeek)
+
+			} else if (week === 3) {
+
+				const currentWeek = weekArray[2][1][correctDayArr]
+				displayWeek(currentWeek)
+
+			}
+
+			if (previousDayOfWeek === 5) {
+				week++
+
+				if (week > 3) {
+					week = 0
+				}
+			}
+		}
+		globalCount()
+	} else {
+		container.innerHTML = ''
 	}
 }
-
 
 function displayWeek(weekDay) {
+	for (let i = 0; i < weekDay.length; i++) {
 
-	// let day = setInterval(setDay, 2000)
-	// function setDay() {
+		let newEl = null
 
-	// }
+		if (i == 0) {
+			newEl = document.createElement('th')
+		} else {
+			newEl = document.createElement('td')
+			if (i < 8) {
+				newEl.style.backgroundColor = "green"
+			} else {
+				newEl.style.backgroundColor = "red"
+			}
+		}
+
+		newEl.textContent = weekDay[i]
+
+		if (i !== 0) {
+			newEl.setAttribute('tabindex', 0)
+			newEl.addEventListener('dblclick', function () {
+				this.remove()
+			})
+		}
+
+		container.append(newEl)
+
+	}
 }
-
-// function renderDay() {
-
-// }
-
-// function restart() {
-// 	week = 0
-// 	window.clearInterval(weekInterval)
-// }
-
-
-
-// function addLi() {
-// 	for (let i = 0; i < 2; i++) {
-
-// 	}
-// }
-
-
-// const container = document.getElementById("container")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// fetch('./trainingData.json')
-// 	.then((response) => response.json())
-// 	.then(function (json) {
-// 		trainingData = Object.entries(json)
-// 		console.log(json)
-// 		return trainingData
-// 	})
-
-
-// const url = './trainingData.json'
-// async function getData(url) {
-// 	const response = await fetch(url)
-
-// 	return response.json()
-// }
-// const trainingData = Object.entries(await getData(url))
