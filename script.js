@@ -15,41 +15,30 @@ let weekArray = null
 onValue(reference, function (snapshot) {
 	if (snapshot.exists()) {
 		weekArray = Object.entries(snapshot.val())
+		checkCurrentTime()
 	} else {
 		alert("Something went wrong")
 	}
 })
 
-let date = null
-let currentDayOfWeek = null
-
-let previousDayOfWeek = 0
-
-let checkTime = setInterval(checkCurrentTime, 3600000)
 function checkCurrentTime() {
-	date = new Date()
-	currentDayOfWeek = date.getDay()
-	if (previousDayOfWeek !== currentDayOfWeek) {
-		previousDayOfWeek = currentDayOfWeek
-		eachDay()
+	const date = new Date()
+	const currentDayOfWeek = date.getDay()
+	let askWeek = null
+	while (askWeek == null || askWeek > 3) {
+		askWeek = Number(prompt("Current week:", 1))
 	}
+	eachDay(currentDayOfWeek, askWeek)
 }
-
-let week = 1;
 
 const container = document.getElementById("container_table")
 
-function eachDay() {
-	if (previousDayOfWeek == 1 ||
-		previousDayOfWeek == 2 ||
-		previousDayOfWeek == 4 ||
-		previousDayOfWeek == 5) {
-
-		container.innerHTML = ''
+function eachDay(currentDay, week) {
+	if (currentDay < 6 && currentDay !== 3 && currentDay !== 0) {
 
 		let correctDayArr = null
 
-		switch (previousDayOfWeek) {
+		switch (currentDay) {
 			case 1:
 				correctDayArr = 0
 				break
@@ -64,35 +53,20 @@ function eachDay() {
 				break
 		}
 
-		function globalCount() {
-			if (week === 1) {
+		let currentWeek = null
 
-				const currentWeek = weekArray[0][1][correctDayArr]
-				displayWeek(currentWeek)
-
-			} else if (week === 2) {
-
-				const currentWeek = weekArray[1][1][correctDayArr]
-				displayWeek(currentWeek)
-
-			} else if (week === 3) {
-
-				const currentWeek = weekArray[2][1][correctDayArr]
-				displayWeek(currentWeek)
-
-			}
-
-			if (previousDayOfWeek === 5) {
-				week++
-
-				if (week > 3) {
-					week = 0
-				}
-			}
+		switch (week) {
+			case 1:
+				currentWeek = weekArray[0][1][correctDayArr]
+				break
+			case 2:
+				currentWeek = weekArray[1][1][correctDayArr]
+				break
+			case 3:
+				currentWeek = weekArray[2][1][correctDayArr]
+				break
 		}
-		globalCount()
-	} else {
-		container.innerHTML = ''
+		displayWeek(currentWeek)
 	}
 }
 
@@ -120,8 +94,6 @@ function displayWeek(weekDay) {
 				this.remove()
 			})
 		}
-
 		container.append(newEl)
-
 	}
 }
