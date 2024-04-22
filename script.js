@@ -24,14 +24,15 @@ let date = null
 let currentDayOfWeek = null
 
 let previousDayOfWeek = 0
-
-let checkTime = setInterval(checkCurrentTime, 3600000)
+let checkTime = setInterval(checkCurrentTime, 3600)
 function checkCurrentTime() {
 	date = new Date()
 	currentDayOfWeek = date.getDay()
+	console.log(currentDayOfWeek)
 	if (previousDayOfWeek !== currentDayOfWeek) {
 		previousDayOfWeek = currentDayOfWeek
 		eachDay()
+		console.log("eachDay is called")
 	}
 }
 
