@@ -7,129 +7,157 @@ const databaseLink = {
 	databaseURL: "https://training-7c03e-default-rtdb.europe-west1.firebasedatabase.app/"
 }
 
-// let name = null;
-
-// while (name !== "ann" && name !== "den") {
-// 	name = prompt("Enter your name:").toLowerCase();
-// }
-
-// let databaseName = null;
-const wellcomeBack = document.getElementById("container_welcomeBack");
-wellcomeBack.textContent = "Wellcome back Den!"
-
-// if (name === "den") {
-// 	databaseName = "trainingDen";
-// 	wellcomeBack.textContent = "Wellcome back Den!"
-// } else if (name === "ann") {
-// 	databaseName = "trainingAnn";
-// 	wellcomeBack.textContent = "Wellcome back Ann!"
-// }
-
-const initApp = initializeApp(databaseLink);
-const database = getDatabase(initApp);
-const reference = ref(database, "trainingDen");
-
-let weekArray = null;
-let weekArrayLength = null;
-
-onValue(reference, function (snapshot) {
-	if (snapshot.exists()) {
-		weekArray = Object.entries(snapshot.val());
-		weekArrayLength = weekArray.length;
-		checkCurrentTime();
+checkUser();
+function checkUser() {
+	let name = null;
+	if (localStorage.getItem("userName")) {
+		name = localStorage.getItem("userName");
 	} else {
-		alert("Something went wrong");
+		while (name !== "ann" && name !== "den") {
+			name = prompt("Enter your name").toLowerCase();
+		}
+		localStorage.setItem("userName", name);
+		localStorage.setItem("currentWeek", 0);
+		localStorage.setItem("currentProgressDays", 0);
+		localStorage.setItem("currentProgressWeeks", 0);
 	}
-})
-
-const optionsButton = document.getElementById("optionsButton");
-const navigationOpt = document.querySelector(".navigation_options");
-
-const changeAccount = document.getElementById("change-account");
-const selectSpecificDay = document.getElementById("select-specifDay");
-const showProgress = document.getElementById("show-progress");
-const viewOthers = document.getElementById("view-others");
-
-optionsButton.addEventListener("click", function () {
-	navigationOpt.classList.toggle("open");
-	const buttonText = optionsButton.textContent;
-	optionsButton.textContent = buttonText === "Options" ? "Exit" : "Options";
-});
-
-
-function checkCurrentTime() {
-	const date = new Date();
-	const currentDayOfWeek = date.getDay();
-	let askWeek = null;
-	while (askWeek == null || askWeek > 3) {
-		askWeek = Number(prompt("Current week:", 1));
-	}
-	eachDay(currentDayOfWeek, askWeek);
+	getUserDataBase(name);
 }
 
-const container = document.getElementById("container_table")
-
-function eachDay(currentDay, week) {
-	if (currentDay < 6 && currentDay !== 3 && currentDay !== 0) {
-
-		let correctDayArr = null
-
-		switch (currentDay) {
-			case 1:
-				correctDayArr = 0
-				break
-			case 2:
-				correctDayArr = 1
-				break
-			case 4:
-				correctDayArr = 2
-				break
-			case 5:
-				correctDayArr = 3
-				break
+function getUserDataBase(userName) {
+	const upperCaseUser = userName.charAt(0).toUpperCase() + userName.slice(1);
+	const databaseName = `training${upperCaseUser}`;
+	const initApp = initializeApp(databaseLink);
+	const database = getDatabase(initApp);
+	const reference = ref(database, databaseName);
+	onValue(reference, function (snapshot) {
+		if (snapshot.exists()) {
+			const weekArray = Object.entries(snapshot.val());
+			document.getElementById("container_welcomeBack").textContent
+				= `Wellcome back ${upperCaseUser}!`;
+			checkCurrentTime(weekArray);
+			setButtons();
+		} else {
+			alert("Something went wrong! Please try again.");
 		}
+	});
+}
 
-		let currentWeek = null
+function checkCurrentTime(weekArray) {
+	const date = new Date();
+	const currentDayOfWeek = date.getDay();
 
-		switch (week) {
-			case 1:
-				currentWeek = weekArray[0][1][correctDayArr]
-				break
-			case 2:
-				currentWeek = weekArray[1][1][correctDayArr]
-				break
-			case 3:
-				currentWeek = weekArray[2][1][correctDayArr]
-				break
+	let week = Number(localStorage.getItem("currentWeek"));
+	console.log(week)
+
+	const weekArrayLength = weekArray.length;
+	const daysInWeek = weekArray[0][1].length;
+	const chooseWeek = document.querySelector('.choose-week');
+	const daysOfWeek = ["Monday", "Tuesday", "Thursday", "Friday"];
+	console.log(weekArray.length)
+	let clickedDay = null;
+
+	for (let i = 0; i < daysInWeek; i++) {
+		const liEl = document.createElement("li");
+		liEl.addEventListener("click", function () {
+			chooseWeek.classList.add('choosen');
+			clickedDay = i;
+			console.log(clickedDay);
+			eachDay(currentDayOfWeek, week, weekArray, weekArrayLength, daysInWeek, clickedDay);
+			lastDay(i);
+		});
+		liEl.textContent = daysOfWeek[i];
+		chooseWeek.appendChild(liEl);
+	};
+
+	function lastDay(day) {
+		if (day === daysInWeek - 1) {
+			if (week === weekArrayLength - 1) {
+				localStorage.setItem("currentWeek", 0);
+			} else {
+				week++;
+				localStorage.setItem("currentWeek", week);
+			}
+			let currentProgressWeeks = localStorage.getItem("currentProgressWeeks");
+			currentProgressWeeks++;
+			localStorage.setItem("currentProgressWeeks", currentProgressWeeks);
 		}
-		displayWeek(currentWeek)
 	}
+
+}
+
+function setButtons() {
+	const optionsButton = document.getElementById("optionsButton");
+	const navigationOpt = document.querySelector(".navigation_options");
+	optionsButton.addEventListener("click", function () {
+		navigationOpt.classList.toggle("open");
+		const buttonText = optionsButton.textContent;
+		optionsButton.textContent = buttonText === "Options" ? "Exit" : "Options";
+	});
+
+	const changeAccount = document.getElementById("change-account");
+	changeAccount.addEventListener("click", changeAccountFunction);
+
+	const showProgress = document.getElementById("show-progress");
+	showProgress.addEventListener("click", showProgressFunction());
+
+	function changeAccountFunction() {
+		localStorage.removeItem('userName');
+		localStorage.removeItem("currentProgressDays");
+		let newUserName = null;
+		while (newUserName !== "ann" && newUserName !== "den") {
+			newUserName = prompt("Enter new user name").toLowerCase();
+		}
+		localStorage.setItem("userName", newUserName);
+		localStorage.setItem("currentProgressDays", 0);
+		getUserDataBase(newUserName);
+	}
+
+	function showProgressFunction() {
+		localStorage.getItem("currentProgressDays");
+
+	}
+}
+
+const container = document.getElementById("container_table");
+
+function eachDay(currentDay, week, weekArray, weekArrayLength, days, clickedDay) {
+	let currentWeek = null;
+	if (week < weekArrayLength) {
+		currentWeek = weekArray[week][1][clickedDay];
+	}
+	console.log(currentWeek);
+	displayWeek(currentWeek)
 }
 
 function displayWeek(weekDay) {
 	for (let i = 0; i < weekDay.length; i++) {
-
-		let newEl = null
-
+		let newEl = null;
 		if (i == 0) {
-			newEl = document.createElement('th')
+			newEl = document.createElement('th');
 		} else {
-			newEl = document.createElement('td')
+			newEl = document.createElement('td');
 			if (i < 8) {
-				newEl.style.backgroundColor = "#08f"
+				newEl.style.backgroundColor = "#08f";
 			} else {
-				newEl.style.backgroundColor = "#f03"
+				newEl.style.backgroundColor = "#f03";
 			}
 		}
-
-		newEl.textContent = weekDay[i]
-
+		newEl.textContent = weekDay[i];
 		if (i !== 0) {
-			newEl.setAttribute('tabindex', 0)
+			newEl.setAttribute('tabindex', 0);
 			newEl.addEventListener('dblclick', function () {
-				this.remove()
-			})
+				this.remove();
+			});
 		}
-		container.append(newEl)
+		container.append(newEl);
 	}
+	container.addEventListener('dblclick', function () {
+		const tableData = document.querySelectorAll("td").length;
+		if (tableData <= 0) {
+			let progress = localStorage.getItem("currentProgressDays");
+			progress++;
+			localStorage.setItem("currentProgressDays", progress);
+		}
+	});
 }
