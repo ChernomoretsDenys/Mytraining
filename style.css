@@ -120,6 +120,7 @@ td {
 	justify-content: center;
 	transition: .8s;
 }
+
 .navigation_options {
 	visibility: hidden;
 	transform: translateY(-100%);
@@ -173,8 +174,6 @@ td {
 #optionsButton:active {
 	transform: scale(var(--base-scale));
 }
-
-
 
 .choose-week.choosen {
 	visibility: hidden;

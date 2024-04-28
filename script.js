@@ -16,12 +16,16 @@ function checkUser() {
 		while (name !== "ann" && name !== "den") {
 			name = prompt("Enter your name").toLowerCase();
 		}
-		localStorage.setItem("userName", name);
-		localStorage.setItem("currentWeek", 0);
-		localStorage.setItem("currentProgressDays", 0);
-		localStorage.setItem("currentProgressWeeks", 0);
+		defineLocalStorage(name);
 	}
 	getUserDataBase(name);
+}
+
+function defineLocalStorage(userNameLocal) {
+	localStorage.setItem("userName", userNameLocal);
+	localStorage.setItem("currentWeek", 0);
+	localStorage.setItem("currentProgressDays", 0);
+	localStorage.setItem("currentProgressWeeks", 0);
 }
 
 function getUserDataBase(userName) {
@@ -44,32 +48,34 @@ function getUserDataBase(userName) {
 }
 
 function checkCurrentTime(weekArray) {
-	const date = new Date();
-	const currentDayOfWeek = date.getDay();
-
+	let chooseWeek = document.querySelector('.choose-week');
+	if (chooseWeek.querySelectorAll("li").length > 0) {
+		chooseWeek.classList.remove("choosen");
+		chooseWeek.textContent = "";
+	}
 	let week = Number(localStorage.getItem("currentWeek"));
-	console.log(week)
-
 	const weekArrayLength = weekArray.length;
 	const daysInWeek = weekArray[0][1].length;
-	const chooseWeek = document.querySelector('.choose-week');
 	const daysOfWeek = ["Monday", "Tuesday", "Thursday", "Friday"];
-	console.log(weekArray.length)
-	let clickedDay = null;
-
 	for (let i = 0; i < daysInWeek; i++) {
 		const liEl = document.createElement("li");
-		liEl.addEventListener("click", function () {
-			chooseWeek.classList.add('choosen');
-			clickedDay = i;
-			console.log(clickedDay);
-			eachDay(currentDayOfWeek, week, weekArray, weekArrayLength, daysInWeek, clickedDay);
-			lastDay(i);
-		});
+		liEl.setAttribute("day", i);
 		liEl.textContent = daysOfWeek[i];
-		chooseWeek.appendChild(liEl);
+		chooseWeek.append(liEl);
 	};
-
+	chooseWeek.addEventListener("click", addChooseWeek);
+	function addChooseWeek(e) {
+		if (e.target.tagName === "LI") {
+			const targetDay = Number(e.target.getAttribute("day"));
+			chooseWeek.classList.add('choosen');
+			eachDay(week, weekArray, targetDay);
+			lastDay(targetDay);
+			removeChooseWeek();
+		}
+	}
+	function removeChooseWeek() {
+		chooseWeek.removeEventListener("click", addChooseWeek);
+	}
 	function lastDay(day) {
 		if (day === daysInWeek - 1) {
 			if (week === weekArrayLength - 1) {
@@ -83,54 +89,18 @@ function checkCurrentTime(weekArray) {
 			localStorage.setItem("currentProgressWeeks", currentProgressWeeks);
 		}
 	}
-
 }
 
-function setButtons() {
-	const optionsButton = document.getElementById("optionsButton");
-	const navigationOpt = document.querySelector(".navigation_options");
-	optionsButton.addEventListener("click", function () {
-		navigationOpt.classList.toggle("open");
-		const buttonText = optionsButton.textContent;
-		optionsButton.textContent = buttonText === "Options" ? "Exit" : "Options";
-	});
-
-	const changeAccount = document.getElementById("change-account");
-	changeAccount.addEventListener("click", changeAccountFunction);
-
-	const showProgress = document.getElementById("show-progress");
-	showProgress.addEventListener("click", showProgressFunction());
-
-	function changeAccountFunction() {
-		localStorage.removeItem('userName');
-		localStorage.removeItem("currentProgressDays");
-		let newUserName = null;
-		while (newUserName !== "ann" && newUserName !== "den") {
-			newUserName = prompt("Enter new user name").toLowerCase();
-		}
-		localStorage.setItem("userName", newUserName);
-		localStorage.setItem("currentProgressDays", 0);
-		getUserDataBase(newUserName);
-	}
-
-	function showProgressFunction() {
-		localStorage.getItem("currentProgressDays");
-
-	}
-}
-
-const container = document.getElementById("container_table");
-
-function eachDay(currentDay, week, weekArray, weekArrayLength, days, clickedDay) {
-	let currentWeek = null;
-	if (week < weekArrayLength) {
-		currentWeek = weekArray[week][1][clickedDay];
-	}
-	console.log(currentWeek);
-	displayWeek(currentWeek)
+function eachDay(week, weekArray, clickedDay) {
+	const currentWeek = weekArray[week][1][clickedDay];
+	displayWeek(currentWeek);
 }
 
 function displayWeek(weekDay) {
+	let container = document.getElementById("container_table");
+	if (container.querySelectorAll('td').length > 0) {
+		container.textContent = "";
+	}
 	for (let i = 0; i < weekDay.length; i++) {
 		let newEl = null;
 		if (i == 0) {
@@ -160,4 +130,42 @@ function displayWeek(weekDay) {
 			localStorage.setItem("currentProgressDays", progress);
 		}
 	});
+}
+
+function setButtons() {
+	const optionsButton = document.getElementById("optionsButton");
+	const navigationOpt = document.querySelector(".navigation_options");
+	optionsButton.addEventListener("click", optionsButtonToggle);
+	function optionsButtonToggle() {
+		navigationOpt.classList.toggle("open");
+		const buttonText = optionsButton.textContent;
+		optionsButton.textContent = buttonText === "Options" ? "Exit" : "Options";
+	}
+	const changeAccount = document.getElementById("change-account");
+	changeAccount.addEventListener("click", changeAccountFunction);
+	const showProgress = document.getElementById("show-progress");
+	showProgress.addEventListener("click", showProgressFunction);
+
+	function changeAccountFunction() {
+		localStorage.removeItem("userName");
+		localStorage.removeItem("currentWeek");
+		localStorage.removeItem("currentProgressDays");
+		localStorage.removeItem("currentProgressWeeks");
+		let newUserName = null;
+		while (newUserName !== "ann" && newUserName !== "den") {
+			newUserName = prompt("Enter new user name").toLowerCase();
+		}
+		optionsButtonToggle();
+		changeAccount.removeEventListener("click", changeAccountFunction);
+		optionsButton.removeEventListener("click", optionsButtonToggle);
+		showProgress.removeEventListener("click", showProgressFunction);
+		defineLocalStorage(newUserName);
+		getUserDataBase(newUserName);
+	}
+	function showProgressFunction() {
+		const showProgressDays = localStorage.getItem("currentProgressDays");
+		const showProgressWeeks = localStorage.getItem("currentProgressWeeks");
+		alert(`You have trained ${showProgressDays} days.
+You have trained ${showProgressWeeks} weeks.`)
+	}
 }
