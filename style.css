@@ -96,8 +96,10 @@ td {
 }
 
 #optionsButton {
+	position: absolute;
+	bottom: 4%;
 	font-size: var(--bigger-font);
-	margin-top: 20px;
+	margin-top: 30px;
 	padding: 8px 20px;
 	border-radius: var(--border-radiusTen);
 	background-color: var(--main-color);

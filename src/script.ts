@@ -1,44 +1,43 @@
-"use strict";
+import { initializeApp, getDatabase, ref, onValue } from "./firebase.js";
+import { User, DataArray } from "./types";
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
+window.addEventListener("load", checkUser);
 
 const databaseLink = {
 	databaseURL: "https://training-7c03e-default-rtdb.europe-west1.firebasedatabase.app/"
 }
 
-checkUser();
 function checkUser() {
-	let name = null;
+	let name: User = null;
 	if (localStorage.getItem("userName")) {
 		name = localStorage.getItem("userName");
 	} else {
 		while (name !== "ann" && name !== "den") {
-			name = prompt("Enter your name").toLowerCase();
+			name = prompt("Enter your name")!.toLowerCase();
 		}
 		defineLocalStorage(name);
 	}
 	getUserDataBase(name);
 }
 
-function defineLocalStorage(userNameLocal) {
+function defineLocalStorage(userNameLocal: string) {
 	localStorage.setItem("userName", userNameLocal);
-	localStorage.setItem("currentWeek", 0);
-	localStorage.setItem("currentProgressDays", 0);
-	localStorage.setItem("currentProgressWeeks", 0);
+	localStorage.setItem("currentWeek", "0");
+	localStorage.setItem("currentProgressDays", "0");
+	localStorage.setItem("currentProgressWeeks", "0");
 }
 
-function getUserDataBase(userName) {
-	const upperCaseUser = userName.charAt(0).toUpperCase() + userName.slice(1);
+function getUserDataBase(userName: User) {
+	const upperCaseUser = userName!.charAt(0).toUpperCase() + userName!.slice(1);
 	const databaseName = `training${upperCaseUser}`;
 	const initApp = initializeApp(databaseLink);
 	const database = getDatabase(initApp);
 	const reference = ref(database, databaseName);
-	onValue(reference, function (snapshot) {
+	onValue(reference, function (snapshot: any) {
 		if (snapshot.exists()) {
-			const weekArray = Object.entries(snapshot.val());
-			document.getElementById("container_welcomeBack").textContent
-				= `Wellcome back ${upperCaseUser}!`;
+			const weekArray: DataArray = Object.entries(snapshot.val());
+			const pEl = <HTMLHtmlElement>document.getElementById("container_welcomeBack");
+			pEl.textContent = `Wellcome back ${upperCaseUser}!`;
 			checkCurrentTime(weekArray);
 			setButtons();
 		} else {
@@ -47,8 +46,8 @@ function getUserDataBase(userName) {
 	});
 }
 
-function checkCurrentTime(weekArray) {
-	let chooseWeek = document.querySelector('.choose-week');
+function checkCurrentTime(weekArray: DataArray) {
+	let chooseWeek = <HTMLUListElement>document.querySelector('.choose-week');
 	if (chooseWeek.querySelectorAll("li").length > 0) {
 		chooseWeek.classList.remove("choosen");
 		chooseWeek.textContent = "";
@@ -59,12 +58,12 @@ function checkCurrentTime(weekArray) {
 	const daysOfWeek = ["Monday", "Tuesday", "Thursday", "Friday"];
 	for (let i = 0; i < daysInWeek; i++) {
 		const liEl = document.createElement("li");
-		liEl.setAttribute("day", i);
+		liEl.setAttribute("day", i.toString());
 		liEl.textContent = daysOfWeek[i];
 		chooseWeek.append(liEl);
 	};
 	chooseWeek.addEventListener("click", addChooseWeek);
-	function addChooseWeek(e) {
+	function addChooseWeek(e: any) {
 		if (e.target.tagName === "LI") {
 			const targetDay = Number(e.target.getAttribute("day"));
 			chooseWeek.classList.add('choosen');
@@ -76,33 +75,33 @@ function checkCurrentTime(weekArray) {
 	function removeChooseWeek() {
 		chooseWeek.removeEventListener("click", addChooseWeek);
 	}
-	function lastDay(day) {
+	function lastDay(day: number) {
 		if (day === daysInWeek - 1) {
 			if (week === weekArrayLength - 1) {
-				localStorage.setItem("currentWeek", 0);
+				localStorage.setItem("currentWeek", "0");
 			} else {
 				week++;
-				localStorage.setItem("currentWeek", week);
+				localStorage.setItem("currentWeek", `${week}`);
 			}
-			let currentProgressWeeks = localStorage.getItem("currentProgressWeeks");
+			let currentProgressWeeks: any = localStorage.getItem("currentProgressWeeks");
 			currentProgressWeeks++;
 			localStorage.setItem("currentProgressWeeks", currentProgressWeeks);
 		}
 	}
 }
 
-function eachDay(week, weekArray, clickedDay) {
-	const currentWeek = weekArray[week][1][clickedDay];
+function eachDay(week: number, weekArray: DataArray, clickedDay: number) {
+	const currentWeek: string[] = weekArray[week][1][clickedDay];
 	displayWeek(currentWeek);
 }
 
-function displayWeek(weekDay) {
-	let container = document.getElementById("container_table");
+function displayWeek(weekDay: string[]) {
+	let container = <HTMLTableElement>document.getElementById("container_table");
 	if (container.querySelectorAll('td').length > 0) {
 		container.textContent = "";
 	}
 	for (let i = 0; i < weekDay.length; i++) {
-		let newEl = null;
+		let newEl: HTMLTableCellElement;
 		if (i == 0) {
 			newEl = document.createElement('th');
 		} else {
@@ -115,7 +114,7 @@ function displayWeek(weekDay) {
 		}
 		newEl.textContent = weekDay[i];
 		if (i !== 0) {
-			newEl.setAttribute('tabindex', 0);
+			newEl.setAttribute('tabindex', "0");
 			newEl.addEventListener('dblclick', function () {
 				this.remove();
 			});
@@ -125,42 +124,45 @@ function displayWeek(weekDay) {
 	container.addEventListener('dblclick', function () {
 		const tableData = document.querySelectorAll("td").length;
 		if (tableData <= 0) {
-			let progress = localStorage.getItem("currentProgressDays");
+			let progress = Number(localStorage.getItem("currentProgressDays"));
 			progress++;
-			localStorage.setItem("currentProgressDays", progress);
+			localStorage.setItem("currentProgressDays", progress.toString());
 		}
 	});
 }
 
 function setButtons() {
-	const optionsButton = document.getElementById("optionsButton");
-	const navigationOpt = document.querySelector(".navigation_options");
+	const optionsButton = <HTMLButtonElement>document.getElementById("optionsButton");
+	const navigationOpt = <HTMLHtmlElement>document.querySelector(".navigation_options");
 	optionsButton.addEventListener("click", optionsButtonToggle);
 	function optionsButtonToggle() {
 		navigationOpt.classList.toggle("open");
 		const buttonText = optionsButton.textContent;
 		optionsButton.textContent = buttonText === "Options" ? "Exit" : "Options";
 	}
-	const changeAccount = document.getElementById("change-account");
+	const changeAccount = <HTMLLIElement>document.getElementById("change-account");
 	changeAccount.addEventListener("click", changeAccountFunction);
-	const showProgress = document.getElementById("show-progress");
+	const showProgress = <HTMLLIElement>document.getElementById("show-progress");
 	showProgress.addEventListener("click", showProgressFunction);
 
 	function changeAccountFunction() {
-		localStorage.removeItem("userName");
-		localStorage.removeItem("currentWeek");
-		localStorage.removeItem("currentProgressDays");
-		localStorage.removeItem("currentProgressWeeks");
-		let newUserName = null;
-		while (newUserName !== "ann" && newUserName !== "den") {
-			newUserName = prompt("Enter new user name").toLowerCase();
+		const askMess = confirm("Are you sure you want to change your account?");
+		if (askMess) {
+			localStorage.removeItem("userName");
+			localStorage.removeItem("currentWeek");
+			localStorage.removeItem("currentProgressDays");
+			localStorage.removeItem("currentProgressWeeks");
+			let newUserName: User = null;
+			while (newUserName !== "ann" && newUserName !== "den") {
+				newUserName = prompt("Enter new user name")!.toLowerCase();
+			}
+			optionsButtonToggle();
+			changeAccount.removeEventListener("click", changeAccountFunction);
+			optionsButton.removeEventListener("click", optionsButtonToggle);
+			showProgress.removeEventListener("click", showProgressFunction);
+			defineLocalStorage(newUserName);
+			getUserDataBase(newUserName);
 		}
-		optionsButtonToggle();
-		changeAccount.removeEventListener("click", changeAccountFunction);
-		optionsButton.removeEventListener("click", optionsButtonToggle);
-		showProgress.removeEventListener("click", showProgressFunction);
-		defineLocalStorage(newUserName);
-		getUserDataBase(newUserName);
 	}
 	function showProgressFunction() {
 		const showProgressDays = localStorage.getItem("currentProgressDays");
