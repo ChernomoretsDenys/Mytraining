@@ -3,6 +3,18 @@ window.addEventListener("load", checkUser);
 const databaseLink = {
     databaseURL: "https://training-7c03e-default-rtdb.europe-west1.firebasedatabase.app/"
 };
+let daysInWeek;
+let targetDay;
+let container;
+function containerProgress() {
+    const tableData = document.querySelectorAll("td").length;
+    if (tableData <= 0) {
+        let progress = Number(localStorage.getItem("currentProgressDays"));
+        progress++;
+        localStorage.setItem("currentProgressDays", progress.toString());
+    }
+}
+;
 function checkUser() {
     let name = null;
     if (localStorage.getItem("userName")) {
@@ -49,7 +61,7 @@ function checkCurrentTime(weekArray) {
     }
     let week = Number(localStorage.getItem("currentWeek"));
     const weekArrayLength = weekArray.length;
-    const daysInWeek = weekArray[0][1].length;
+    daysInWeek = weekArray[0][1].length;
     const daysOfWeek = ["Monday", "Tuesday", "Thursday", "Friday"];
     for (let i = 0; i < daysInWeek; i++) {
         const liEl = document.createElement("li");
@@ -61,7 +73,7 @@ function checkCurrentTime(weekArray) {
     chooseWeek.addEventListener("click", addChooseWeek);
     function addChooseWeek(e) {
         if (e.target.tagName === "LI") {
-            const targetDay = Number(e.target.getAttribute("day"));
+            targetDay = Number(e.target.getAttribute("day"));
             chooseWeek.classList.add('choosen');
             eachDay(week, weekArray, targetDay);
             lastDay(targetDay);
@@ -91,7 +103,7 @@ function eachDay(week, weekArray, clickedDay) {
     displayWeek(currentWeek);
 }
 function displayWeek(weekDay) {
-    let container = document.getElementById("container_table");
+    container = document.getElementById("container_table");
     if (container.querySelectorAll('td').length > 0) {
         container.textContent = "";
     }
@@ -102,12 +114,7 @@ function displayWeek(weekDay) {
         }
         else {
             newEl = document.createElement('td');
-            if (i < 8) {
-                newEl.style.backgroundColor = "#08f";
-            }
-            else {
-                newEl.style.backgroundColor = "#f03";
-            }
+            newEl.style.backgroundColor = "#08f";
         }
         newEl.textContent = weekDay[i];
         if (i !== 0) {
@@ -118,14 +125,7 @@ function displayWeek(weekDay) {
         }
         container.append(newEl);
     }
-    container.addEventListener('dblclick', function () {
-        const tableData = document.querySelectorAll("td").length;
-        if (tableData <= 0) {
-            let progress = Number(localStorage.getItem("currentProgressDays"));
-            progress++;
-            localStorage.setItem("currentProgressDays", progress.toString());
-        }
-    });
+    container.addEventListener('dblclick', containerProgress);
 }
 function setButtons() {
     const optionsButton = document.getElementById("optionsButton");
@@ -140,6 +140,8 @@ function setButtons() {
     changeAccount.addEventListener("click", changeAccountFunction);
     const showProgress = document.getElementById("show-progress");
     showProgress.addEventListener("click", showProgressFunction);
+    const changeCurrentDay = document.getElementById("change-currentDay");
+    changeCurrentDay.addEventListener("click", changeCurrentDayFunction);
     function changeAccountFunction() {
         const askMess = confirm("Are you sure you want to change your account?");
         if (askMess) {
@@ -151,12 +153,8 @@ function setButtons() {
             while (newUserName !== "ann" && newUserName !== "den") {
                 newUserName = prompt("Enter new user name").toLowerCase();
             }
-            optionsButtonToggle();
-            changeAccount.removeEventListener("click", changeAccountFunction);
-            optionsButton.removeEventListener("click", optionsButtonToggle);
-            showProgress.removeEventListener("click", showProgressFunction);
+            reset(newUserName);
             defineLocalStorage(newUserName);
-            getUserDataBase(newUserName);
         }
     }
     function showProgressFunction() {
@@ -164,5 +162,27 @@ function setButtons() {
         const showProgressWeeks = localStorage.getItem("currentProgressWeeks");
         alert(`You have trained ${showProgressDays} days.
 You have trained ${showProgressWeeks} weeks.`);
+    }
+    function changeCurrentDayFunction() {
+        const askMess = confirm("Are you sure you want to change current day?");
+        if (askMess) {
+            const userName = localStorage.getItem("userName");
+            if (targetDay === daysInWeek - 1) {
+                const currentWeekProgress = (Number(localStorage.getItem("currentWeek")) - 1).toString();
+                const currentWeeksProgress = (Number(localStorage.getItem("currentProgressWeeks")) - 1).toString();
+                localStorage.setItem("currentWeek", currentWeekProgress);
+                localStorage.setItem("currentProgressWeeks", currentWeeksProgress);
+            }
+            reset(userName);
+        }
+    }
+    function reset(user) {
+        optionsButtonToggle();
+        changeCurrentDay.removeEventListener("click", changeCurrentDayFunction);
+        changeAccount.removeEventListener("click", changeAccountFunction);
+        optionsButton.removeEventListener("click", optionsButtonToggle);
+        showProgress.removeEventListener("click", showProgressFunction);
+        getUserDataBase(user);
+        container.removeEventListener('dblclick', containerProgress);
     }
 }
