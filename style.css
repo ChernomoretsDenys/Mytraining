@@ -42,8 +42,6 @@ body {
 #container_table {
 	min-width: 350px;
 	padding: 12px;
-	display: flex;
-	flex-direction: column;
 	gap: 10px;
 	--border-angle: 0turn;
 	--main-bg: conic-gradient(from var(--border-angle),
@@ -60,6 +58,104 @@ body {
 	background-position: center center;
 	-webkit-animation: bg-spin 3s linear infinite;
 	animation: bg-spin 3s linear infinite;
+	display: grid;
+	grid-template-columns: 1fr 40px;
+	grid-template-areas:
+		"th th"
+		"td-1 p-1"
+		"td-2 p-2"
+		"td-3 p-3"
+		"td-4 p-4"
+		"td-5 p-5"
+		"td-6 p-6"
+		"td-7 p-7"
+		"td-8 p-8"
+		"td-9 p-9";
+}
+
+#container_table p {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border: 2px solid var(--main-color);
+	border-radius: var(--border-radiusTen);
+	margin: 0;
+}
+
+th {
+	grid-area: th;
+}
+
+.td-1 {
+	grid-area: td-1;
+}
+
+.p-1 {
+	grid-area: p-1;
+}
+
+.td-2 {
+	grid-area: td-2;
+}
+
+.p-2 {
+	grid-area: p-2;
+}
+
+.td-3 {
+	grid-area: td-3;
+}
+
+.p-3 {
+	grid-area: p-3;
+}
+
+.td-4 {
+	grid-area: td-4;
+}
+
+.p-4 {
+	grid-area: p-4;
+}
+
+.td-5 {
+	grid-area: td-5;
+}
+
+.p-5 {
+	grid-area: p-5;
+}
+
+.td-6 {
+	grid-area: td-6;
+}
+
+.p-6 {
+	grid-area: p-6;
+}
+
+.td-7 {
+	grid-area: td-7;
+}
+
+.p-7 {
+	grid-area: p-7;
+}
+
+.td-8 {
+	grid-area: td-8;
+}
+
+.p-8 {
+	grid-area: p-8;
+}
+
+.td-9 {
+	grid-area: td-9;
+}
+
+.p-9 {
+	grid-area: p-9;
 }
 
 @-webkit-keyframes bg-spin {

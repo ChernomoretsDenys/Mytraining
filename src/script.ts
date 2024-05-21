@@ -9,6 +9,7 @@ const databaseLink = {
 let daysInWeek: number;
 let targetDay: number;
 let container: HTMLTableElement;
+let numberOfSets: number;
 function containerProgress() {
 	const tableData = document.querySelectorAll("td").length;
 	if (tableData <= 0) {
@@ -40,6 +41,13 @@ function defineLocalStorage(userNameLocal: string) {
 
 function getUserDataBase(userName: User) {
 	const upperCaseUser = userName!.charAt(0).toUpperCase() + userName!.slice(1);
+	if (upperCaseUser === "Ann") {
+		numberOfSets = 3;
+	} else if (upperCaseUser === "Den") {
+		numberOfSets = 4;
+	} else {
+		alert("Something went wrong!");
+	}
 	const databaseName = `training${upperCaseUser}`;
 	const initApp = initializeApp(databaseLink);
 	const database = getDatabase(initApp);
@@ -111,6 +119,14 @@ function displayWeek(weekDay: string[]) {
 	if (container.querySelectorAll('td').length > 0) {
 		container.textContent = "";
 	}
+
+	function checkExercise(a: number, b: string | null, c: boolean) {
+		const p = document.querySelector(`.p-${b}`)
+		p!.textContent = a.toString();
+		if (c) {
+			p?.remove();
+		}
+	}
 	for (let i = 0; i < weekDay.length; i++) {
 		let newEl: HTMLTableCellElement;
 		if (i == 0) {
@@ -121,12 +137,29 @@ function displayWeek(weekDay: string[]) {
 		}
 		newEl.textContent = weekDay[i];
 		if (i !== 0) {
-			newEl.setAttribute('tabindex', "0");
+			newEl.setAttribute('times', "0");
+			newEl.setAttribute('class', `td-${i}`);
+			newEl.setAttribute('element', `${i}`);
 			newEl.addEventListener('dblclick', function () {
-				this.remove();
+				const singleSet = Number(newEl.getAttribute("times")) + 1;
+				const element = newEl.getAttribute('element');
+				checkExercise(singleSet, element, false);
+				newEl.setAttribute('times', (singleSet).toString());
+				if (singleSet === numberOfSets) {
+					checkExercise(singleSet, element, true);
+					this.remove();
+				}
 			});
 		}
 		container.append(newEl);
+	}
+	for (let i = 0; i < weekDay.length - 1; i++) {
+		let el = document.createElement('p');
+		const trueCount = i + 1;
+		el.setAttribute("class", `p-${trueCount}`);
+		el.style.backgroundColor = "#dd4e26";
+		el.textContent = "0";
+		container.append(el);
 	}
 	container.addEventListener('dblclick', containerProgress);
 }

@@ -6,6 +6,7 @@ const databaseLink = {
 let daysInWeek;
 let targetDay;
 let container;
+let numberOfSets;
 function containerProgress() {
     const tableData = document.querySelectorAll("td").length;
     if (tableData <= 0) {
@@ -36,6 +37,15 @@ function defineLocalStorage(userNameLocal) {
 }
 function getUserDataBase(userName) {
     const upperCaseUser = userName.charAt(0).toUpperCase() + userName.slice(1);
+    if (upperCaseUser === "Ann") {
+        numberOfSets = 3;
+    }
+    else if (upperCaseUser === "Den") {
+        numberOfSets = 4;
+    }
+    else {
+        alert("Something went wrong!");
+    }
     const databaseName = `training${upperCaseUser}`;
     const initApp = initializeApp(databaseLink);
     const database = getDatabase(initApp);
@@ -107,6 +117,13 @@ function displayWeek(weekDay) {
     if (container.querySelectorAll('td').length > 0) {
         container.textContent = "";
     }
+    function checkExercise(a, b, c) {
+        const p = document.querySelector(`.p-${b}`);
+        p.textContent = a.toString();
+        if (c) {
+            p === null || p === void 0 ? void 0 : p.remove();
+        }
+    }
     for (let i = 0; i < weekDay.length; i++) {
         let newEl;
         if (i == 0) {
@@ -118,12 +135,29 @@ function displayWeek(weekDay) {
         }
         newEl.textContent = weekDay[i];
         if (i !== 0) {
-            newEl.setAttribute('tabindex', "0");
+            newEl.setAttribute('times', "0");
+            newEl.setAttribute('class', `td-${i}`);
+            newEl.setAttribute('element', `${i}`);
             newEl.addEventListener('dblclick', function () {
-                this.remove();
+                const singleSet = Number(newEl.getAttribute("times")) + 1;
+                const element = newEl.getAttribute('element');
+                checkExercise(singleSet, element, false);
+                newEl.setAttribute('times', (singleSet).toString());
+                if (singleSet === numberOfSets) {
+                    checkExercise(singleSet, element, true);
+                    this.remove();
+                }
             });
         }
         container.append(newEl);
+    }
+    for (let i = 0; i < weekDay.length - 1; i++) {
+        let el = document.createElement('p');
+        const trueCount = i + 1;
+        el.setAttribute("class", `p-${trueCount}`);
+        el.style.backgroundColor = "#dd4e26";
+        el.textContent = "0";
+        container.append(el);
     }
     container.addEventListener('dblclick', containerProgress);
 }
