@@ -56,7 +56,7 @@ function getUserDataBase(userName: User) {
 		if (snapshot.exists()) {
 			const weekArray: DataArray = Object.entries(snapshot.val());
 			const pEl = <HTMLHtmlElement>document.getElementById("container_welcomeBack");
-			pEl.textContent = `Wellcome back ${upperCaseUser}!`;
+			pEl.textContent = `Welcome back ${upperCaseUser}!`;
 			checkCurrentTime(weekArray);
 			setButtons();
 		} else {
@@ -74,7 +74,7 @@ function checkCurrentTime(weekArray: DataArray) {
 	let week = Number(localStorage.getItem("currentWeek"));
 	const weekArrayLength = weekArray.length;
 	daysInWeek = weekArray[0][1].length;
-	const daysOfWeek = ["Monday", "Tuesday", "Thursday", "Friday"];
+	const daysOfWeek = ["Monday", "Tuesday", "Thursday", "Saturday"];
 	for (let i = 0; i < daysInWeek; i++) {
 		const liEl = document.createElement("li");
 		liEl.setAttribute("day", i.toString());
@@ -111,6 +111,12 @@ function checkCurrentTime(weekArray: DataArray) {
 
 function eachDay(week: number, weekArray: DataArray, clickedDay: number) {
 	const currentWeek: string[] = weekArray[week][1][clickedDay];
+	const numberMatch:number = Number(currentWeek[0].match(/\d+/));
+		if (numberMatch) {
+			if (numberMatch > 40) {
+				numberOfSets = 3;
+			 }
+		}
 	displayWeek(currentWeek);
 }
 
@@ -119,7 +125,6 @@ function displayWeek(weekDay: string[]) {
 	if (container.querySelectorAll('td').length > 0) {
 		container.textContent = "";
 	}
-
 	function checkExercise(a: number, b: string | null, c: boolean) {
 		const p = document.querySelector(`.p-${b}`)
 		p!.textContent = a.toString();
