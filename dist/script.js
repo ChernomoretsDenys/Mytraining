@@ -140,7 +140,7 @@ function displayWeek(weekDay) {
             newEl.style.backgroundColor = "#08f";
         }
         newEl.textContent = weekDay[i];
-        if (i !== 0) {
+        if (i > 2 && i < 9) {
             newEl.setAttribute('times', "0");
             newEl.setAttribute('class', `td-${i}`);
             newEl.setAttribute('element', `${i}`);
@@ -155,15 +155,29 @@ function displayWeek(weekDay) {
                 }
             });
         }
+        else {
+            newEl.setAttribute('times', String(numberOfSets - 1));
+            newEl.setAttribute('class', `td-${i}`);
+            newEl.setAttribute('element', `${i}`);
+            newEl.addEventListener('dblclick', function () {
+                const singleSet = Number(newEl.getAttribute("times")) + 1;
+                newEl.setAttribute('times', (singleSet).toString());
+                if (singleSet === numberOfSets) {
+                    console.log("dasfs");
+                    this.remove();
+                }
+            });
+        }
         container.append(newEl);
     }
     for (let i = 0; i < weekDay.length - 1; i++) {
-        let el = document.createElement('p');
-        const trueCount = i + 1;
-        el.setAttribute("class", `p-${trueCount}`);
-        el.style.backgroundColor = "#dd4e26";
-        el.textContent = "0";
-        container.append(el);
+        if (i > 2 && i < 9) {
+            let el = document.createElement('p');
+            el.setAttribute("class", `p-${i}`);
+            el.style.backgroundColor = "#dd4e26";
+            el.textContent = "0";
+            container.append(el);
+        }
     }
     container.addEventListener('dblclick', containerProgress);
 }
