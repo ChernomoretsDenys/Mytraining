@@ -156,15 +156,9 @@ function displayWeek(weekDay: string[]) {
 				}
 			});
 		} else {
-			newEl.setAttribute('times', String(numberOfSets-1));
 			newEl.setAttribute('class', `td-${i}`);
-			newEl.setAttribute('element', `${i}`);
 			newEl.addEventListener('dblclick', function () {
-				const singleSet = Number(newEl.getAttribute("times")) + 1;
-				newEl.setAttribute('times', (singleSet).toString());
-				if (singleSet === numberOfSets) {
-					this.remove();
-				}
+				this.remove();
 			});
 		}
 		container.append(newEl);
