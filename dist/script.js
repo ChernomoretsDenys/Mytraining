@@ -41,7 +41,7 @@ function getUserDataBase(userName) {
         numberOfSets = 3;
     }
     else if (upperCaseUser === "Den") {
-        numberOfSets = 4;
+        numberOfSets = 5;
     }
     else {
         alert("Something went wrong!");
@@ -112,8 +112,8 @@ function eachDay(week, weekArray, clickedDay) {
     const currentWeek = weekArray[week][1][clickedDay];
     const numberMatch = Number(currentWeek[0].match(/\d+/));
     if (numberMatch) {
-        if (numberMatch > 40) {
-            numberOfSets = 3;
+        if (numberMatch > 2) {
+            numberOfSets = 4;
         }
     }
     displayWeek(currentWeek);
