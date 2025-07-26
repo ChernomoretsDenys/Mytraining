@@ -63,15 +63,14 @@ body {
 	grid-template-areas:
 		"th th"
 		"td-1 td-1"
-		"td-2 td-2"
+		"td-2 p-2"
 		"td-3 p-3"
 		"td-4 p-4"
 		"td-5 p-5"
 		"td-6 p-6"
 		"td-7 p-7"
-		"td-8 p-8"
-		"td-9 td-9"
-		"td-10 td-10";
+		"td-8 td-8"
+		"td-9 td-9";
 }
 
 #container_table p {
@@ -93,6 +92,10 @@ th {
 
 .td-2 {
 	grid-area: td-2;
+}
+
+.p-2 {
+	grid-area: p-2;
 }
 
 .td-3 {

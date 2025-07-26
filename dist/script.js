@@ -140,7 +140,7 @@ function displayWeek(weekDay) {
             newEl.style.backgroundColor = "#08f";
         }
         newEl.textContent = weekDay[i];
-        if (i > 2 && i < 9) {
+        if (i > 1 && i < 8) {
             newEl.setAttribute('times', "0");
             newEl.setAttribute('class', `td-${i}`);
             newEl.setAttribute('element', `${i}`);
