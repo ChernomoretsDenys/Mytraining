@@ -164,7 +164,7 @@ function displayWeek(weekDay: string[]) {
 		container.append(newEl);
 	}
 	for (let i = 0; i < weekDay.length - 1; i++) {
-		if (i > 1 && i < 9) { 
+		if (i > 1 && i < 8) { 
 			let el = document.createElement('p');
 			el.setAttribute("class", `p-${i}`);
 			el.style.backgroundColor = "#dd4e26";
