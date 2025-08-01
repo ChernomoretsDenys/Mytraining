@@ -74,7 +74,7 @@ function checkCurrentTime(weekArray: DataArray) {
 	let week = Number(localStorage.getItem("currentWeek"));
 	const weekArrayLength = weekArray.length;
 	daysInWeek = weekArray[0][1].length;
-	const daysOfWeek = ["Monday", "Tuesday","Wednesday", "Thursday","Friday", "Saturday"];
+	const daysOfWeek = ["Monday", "Tuesday","Wednesday", "Thursday","Friday"];
 	for (let i = 0; i < daysInWeek; i++) {
 		const liEl = document.createElement("li");
 		liEl.setAttribute("day", i.toString());
